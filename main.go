@@ -39,7 +39,7 @@ type MyDummyModel struct {
 type NestedVal struct {
 	FieldX		string `json:"field_x"`
 	FieldY		int `json:"field_y"`
-	Field		string  `json:"field"`
+	FieldZeta	uint64  `json:"field_zeta"`
 }
 
 type MyDummyModelResponse struct {

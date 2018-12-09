@@ -5,6 +5,7 @@ import (
 	"go/ast"
 	"go/parser"
 	"go/token"
+	"go/types"
 	"gopkg.in/yaml.v2"
 	"io/ioutil"
 	"log"
@@ -15,21 +16,23 @@ var (
 	yamlOutput *YamlOutput
 	modelsUsed map[string] bool
 
-	builtInTypes map[string]string
+	golangNumeric map[string]string
 )
 
 func init() {
-	builtInTypes = make(map[string]string)
+	golangNumeric = make(map[string]string)
+	golangNumeric["int"] = "number"
+	golangNumeric["int8"] = "number"
+	golangNumeric["int16"] = "number"
+	golangNumeric["int32"] = "number"
+	golangNumeric["int64"] = "number"
+	golangNumeric["uint8"] = "number"
+	golangNumeric["uint16"] = "number"
+	golangNumeric["uint32"] = "number"
+	golangNumeric["uint64"] = "number"
+	golangNumeric["float64"] = "number"
+	golangNumeric["float32"] = "number"
 
-	builtInTypes[`int`] = ""
-	builtInTypes[`int64`] = ""
-	builtInTypes[`uint8`] = ""
-	builtInTypes[`float32`] = ""
-	builtInTypes[`float64`] = ""
-	builtInTypes[`string`] = ""
-	builtInTypes[`map`] = ""
-	builtInTypes[`bool`] = ""
-	builtInTypes[`boolean`] = ""
 }
 
 func GenerateFile(filePath string) {
@@ -195,9 +198,10 @@ func parseModelsFromFile(fileName string) {
 								fieldType = safeCast.Name
 							}
 
-							_, builtin := builtInTypes[fieldType]
+							builtin := isBasicType(fieldType)
 
-							if fieldType == "int" || fieldType == "float64" || fieldType == "float32"  {
+							_, isNumber := golangNumeric[fieldType]
+							if isNumber {
 								fieldType = "number"
 							}
 
@@ -299,3 +303,13 @@ func retrieveKeyFromAstFile(key string, ast *ast.File) string {
 	return ""
 }
 
+func isBasicType(typeString string) bool {
+
+	for _, v := range types.Typ {
+		if typeString == v.Name() {
+			return true
+		}
+	}
+
+	return false
+}

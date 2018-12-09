@@ -63,9 +63,9 @@ components:
           type: number
     NestedVal:
       properties:
-        field:
-          type: string
         field_x:
           type: string
         field_y:
+          type: number
+        field_zeta:
           type: number
