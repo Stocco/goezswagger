@@ -16,6 +16,8 @@ Then simply add the routes you want  anywhere in your code! (Just for the sake o
 
 	- the request and response fields should map to an existing model in your project.
 	    they will map all your fields tagged with json
+	
+	- The response field should be a list of key:value, like on the example below. The number before `:` indicates the responseCode and the model indicates which model is associated with that response.     
 
 //@path `your-api-path`  
 //@method `method`  
