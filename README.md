@@ -39,3 +39,6 @@ Then simply add the annotation routes you want  anywhere in your code! (Just for
 //@tags `create`  
 //@request `MyDummyModel`  
 //@response `200:MyDummyModelResponse`  
+
+
+Again, check main.go for examples on how to use annotations.
