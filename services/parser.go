@@ -61,12 +61,6 @@ func GenerateFile(filePath string) {
 		}
 	}
 
-	for k, _ := range yamlOutput.Components.Schema {
-		_, used := modelsUsed[k]
-		if !used {
-			delete(yamlOutput.Components.Schema, k)
-		}
-	}
 
 	bytes, err := yaml.Marshal(yamlOutput)
 	if err != nil {
@@ -186,17 +180,25 @@ func parseModelsFromFile(fileName string) {
 						if field.Tag != nil && strings.Contains(field.Tag.Value, "json:") {
 
 							safeCast, okIdent := field.Type.(*ast.Ident)
-							safePointerCast, okStarExrp := field.Type.(*ast.StarExpr)
-							if !okIdent && !okStarExrp {
+							safePointerCast, okStarExpr := field.Type.(*ast.StarExpr)
+							safeMapCast, okMap := field.Type.(*ast.MapType)
+							safeArrayCast, okArray := field.Type.(*ast.ArrayType)
+
+							if !okIdent && !okStarExpr && !okMap && !okArray {
 								return
 							}
 
 							var fieldType string
-							if safeCast == nil {
-								fieldType = safePointerCast.X.(*ast.Ident).Name
-							} else {
+							if safeCast != nil {
 								fieldType = safeCast.Name
+							} else if safePointerCast  != nil {
+								fieldType = safePointerCast.X.(*ast.Ident).Name
+							} else if safeMapCast != nil {
+								fieldType = "object"
+							} else if safeArrayCast != nil {
+								fieldType = "array"
 							}
+
 
 							builtin := isBasicType(fieldType)
 
@@ -205,6 +207,9 @@ func parseModelsFromFile(fileName string) {
 								fieldType = "number"
 							}
 
+							if fieldType == "bool" {
+								fieldType = "boolean"
+							}
 
 							if yamlOutput.Components.Schema[model.Name] == nil {
 								yamlOutput.Components.Schema[model.Name] = &ModelSchema{Properties: make(map[string] *Properties)}
@@ -212,6 +217,10 @@ func parseModelsFromFile(fileName string) {
 
 							if builtin {
 								yamlOutput.Components.Schema[model.Name].Properties[extractKey(field.Tag.Value, "json")] = &Properties{Type: fieldType, Description: extractKey(field.Tag.Value, "description")}
+							} else if fieldType == "array" {
+								yamlOutput.Components.Schema[model.Name].Properties[extractKey(field.Tag.Value, "json")] = &Properties{Type: fieldType, Items: &Schema{Ref: `#/components/schemas/` + safeArrayCast.Elt.(*ast.StarExpr).X.(*ast.Ident).Name}}
+							} else if fieldType == "object" {
+								yamlOutput.Components.Schema[model.Name].Properties[extractKey(field.Tag.Value, "json")] = &Properties{Type: fieldType}
 							} else {
 								yamlOutput.Components.Schema[model.Name].Properties[extractKey(field.Tag.Value, "json")] = &Properties{Ref: `#/components/schemas/` + fieldType}
 								modelsUsed[fieldType] = true
@@ -234,7 +243,7 @@ func extractKey(fieldTag string, key string) string {
 
 	value := ""
 	for pos := strings.Index(fieldTag, key) + len(key) + 2; pos < len(fieldTag) ; pos++ {
-		if fieldTag[pos:pos + 1] == `"` {
+		if fieldTag[pos:pos + 1] == `"` || fieldTag[pos:pos + 1] == `,` {
 			return value
 		}
 

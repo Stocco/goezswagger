@@ -46,15 +46,41 @@ paths:
                 $ref: '#/components/schemas/MyDummyModelResponse'
 components:
   schemas:
+    AccountHolder:
+      properties:
+        bankaccount:
+          $ref: '#/components/schemas/BankAc'
+        name:
+          type: string
+    BankAc:
+      properties:
+        destination:
+          type: boolean
+    IncomingTransferRequest:
+      properties:
+        longitude:
+          type: number
+        metadata:
+          type: object
+        payment_details:
+          $ref: '#/components/schemas/Paymentz'
+        source_holder:
+          $ref: '#/components/schemas/AccountHolder'
     MyDummyModel:
       properties:
         aeho:
           $ref: '#/components/schemas/NestedVal'
+        aeho_arrat:
+          type: array
+          items:
+            $ref: '#/components/schemas/NestedVal'
         field_four:
           type: string
         field_one:
           type: string
           description: field is the number one
+        inc_request:
+          $ref: '#/components/schemas/IncomingTransferRequest'
     MyDummyModelResponse:
       properties:
         amount:
@@ -63,9 +89,15 @@ components:
           type: number
     NestedVal:
       properties:
+        field_bool:
+          type: boolean
         field_x:
           type: string
         field_y:
           type: number
         field_zeta:
           type: number
+    Paymentz:
+      properties:
+        type:
+          type: string
