@@ -11,6 +11,16 @@ For this beta version the annotations order matters so follow the examples .
 //@version your-api-version  
 //@description your-api-description  
 
+Your structs should match the golang pattern like in the example bellow:
+
+    type MyDummyModel struct {
+    	FieldOne	             string `json:"field_one" description:"field is the number one" validate:"required"`
+    	FieldTwoNotMapped        string `validate:"required"`
+    	FieldThreeForgotten      string
+    	FieldFour			      string `json:"field_four"`
+    }
+
+The mapper will use the fields that are annotated with `json`, plus the description (if provided)
 
 Then simply add the routes you want  anywhere in your code! (Just for the sake of organization, add above the handlers...)  
 
