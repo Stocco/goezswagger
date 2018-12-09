@@ -21,6 +21,12 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/MyDummyModelResponse'
+        "400":
+          description: ok
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MyDummyModelResponse'
 components:
   schemas:
     MyDummyModel:

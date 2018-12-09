@@ -25,4 +25,4 @@ Then simply add the routes you want  anywhere in your code! (Just for the sake o
 //@summary `summary-of-your-api-route`  
 //@tags `create`  
 //@request `MyDummyModel`  
-//@response `200:MyDummyModelResponse`  
+//@response `200:MyDummyModelResponse 400:MyDummyModelResponse`  

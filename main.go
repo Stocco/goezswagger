@@ -23,7 +23,7 @@ func main() {
 //@summary create a dummy route
 //@tags create
 //@request MyDummyModel
-//@response 200:MyDummyModelResponse
+//@response 200:MyDummyModelResponse 400:MyDummyModelResponse
 func dummyRoute() {
 	log.Println("HEY THERE")
 }
