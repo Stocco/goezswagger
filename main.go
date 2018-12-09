@@ -10,12 +10,12 @@ import (
 //@version 1.0.0-beta
 //@description goezswag is a easy swagger
 func main() {
-	string, err := os.Getwd()
+	workingProject, err := os.Getwd()
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	services.GenerateFile(string)
+	services.GenerateFile(workingProject)
 }
 
 //@path /v1/dummy/route
