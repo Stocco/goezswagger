@@ -22,7 +22,7 @@ Your structs should match the golang pattern like in the example bellow:
 
 The mapper will use the fields that are annotated with `json`, plus the description (if provided)
 
-Then simply add the routes you want  anywhere in your code! (Just for the sake of organization, add above the handlers...)  
+Then simply add the annotation routes you want  anywhere in your code! (Just for the sake of organization, add above the handlers...)  
 
 	- currently tags are in alpha ( it should be a list with empty spaces (create list get ...))
 
