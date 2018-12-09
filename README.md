@@ -31,10 +31,12 @@ Then simply add the annotation routes you want  anywhere in your code! (Just for
 	
 	- The response field should be a list of key:value separated with empt, like on the example below.  
 	    The number before `:` indicates the responseCode   
-	    and the model indicates which model is to be associated with that response.     
+	    and the model indicates which model is to be associated with that response.    
+	    
+	- method name should be lower case   
 
 //@path `your-api-path`  
-//@method `method`  
+//@method `method`
 //@summary `summary-of-your-api-route`  
 //@tags `create`  
 //@request `MyDummyModel`  
