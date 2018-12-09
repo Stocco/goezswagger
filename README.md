@@ -12,7 +12,7 @@ For this beta version the annotations order matters so follow the examples .
 //@description your-api-description  
 
 
-Then simply add the routes you want  anywhere in your code! (Just for the sake of organization, add above the handlers...)  
+Then simply add the annotation routes you want  anywhere in your code! (Just for the sake of organization, add above the handlers...)  
 
 	- currently tags are in alpha ( it should be a list with empty spaces (create list get ...))
 
