@@ -69,3 +69,14 @@ type BankAc struct {
 type Paymentz struct {
 	Type             string  `json:"type,omitempty"`
 }
+
+
+type Health struct {
+	Name       string           `json:"name"`
+	Components HealthComponents `json:"components"`
+}
+
+type HealthComponents struct {
+	Http     bool `json:"Http"`
+	Cache    bool `json:"Cache"`
+}

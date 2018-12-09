@@ -56,6 +56,18 @@ components:
       properties:
         destination:
           type: boolean
+    Health:
+      properties:
+        components:
+          $ref: '#/components/schemas/HealthComponents'
+        name:
+          type: string
+    HealthComponents:
+      properties:
+        Cache:
+          type: boolean
+        Http:
+          type: boolean
     IncomingTransferRequest:
       properties:
         longitude:
@@ -84,7 +96,7 @@ components:
     MyDummyModelResponse:
       properties:
         amount:
-          type: number
+          type: integer
         amount_double:
           type: number
     NestedVal:
@@ -94,9 +106,9 @@ components:
         field_x:
           type: string
         field_y:
-          type: number
+          type: integer
         field_zeta:
-          type: number
+          type: integer
     Paymentz:
       properties:
         type:
