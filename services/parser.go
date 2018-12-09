@@ -30,7 +30,7 @@ func GenerateFile(filePath string) {
 		log.Fatal(err.Error())
 	}
 
-	err = ioutil.WriteFile("./swags.yaml", bytes, 0644)
+	err = ioutil.WriteFile("./generated_swagger.yaml", bytes, 0644)
 	if err != nil {
 		log.Fatal(err.Error())
 	}
