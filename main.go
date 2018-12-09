@@ -14,7 +14,6 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-
 	services.GenerateFile(workingProject)
 }
 

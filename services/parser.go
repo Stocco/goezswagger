@@ -13,12 +13,14 @@ import (
 
 var (
 	yamlOutput *YamlOutput
+	modelsUsed map[string] bool
 )
 
 
 func GenerateFile(filePath string) {
 
 	yamlOutput = &YamlOutput{Openapi: "3.0.0", Info: &Info{}, Paths: make(map[string] map[string] *Method), Components: &Components{Schema: make(map[string] *ModelSchema)}}
+	modelsUsed = make(map[string]bool)
 
 	log.Println(fmt.Sprintf("Parsing main dir ..."))
 	parseHeaders(filePath)
@@ -41,6 +43,12 @@ func GenerateFile(filePath string) {
 		}
 	}
 
+	for k, _ := range yamlOutput.Components.Schema {
+		_, used := modelsUsed[k]
+		if !used {
+			delete(yamlOutput.Components.Schema, k)
+		}
+	}
 
 	bytes, err := yaml.Marshal(yamlOutput)
 	if err != nil {
@@ -53,7 +61,7 @@ func GenerateFile(filePath string) {
 	}
 
 
-	log.Println(fmt.Sprintf("Parse completed. File generate at project dir: generated_swagger.yaml"))
+	log.Println(fmt.Sprintf("Parse completed. Models used [%v] File generate at project dir: generated_swagger.yaml", modelsUsed))
 
 }
 
@@ -98,6 +106,7 @@ func checkIfRouteComentGroup(comments []*ast.Comment) {
 
 		if pos := findKeyInComments("//@request", comments) ; pos > 0 {
 			method.RequestBody = &RequestBody{Content: &Content{ApplicationType: &ApplicationType{Schema: &Schema{Ref: `#/components/schemas/` + strings.TrimSpace(comments[pos].Text[len("//@request")+1:])}}}}
+			modelsUsed[strings.TrimSpace(comments[pos].Text[len("//@request")+1:])] = true
 		}
 
 
@@ -108,6 +117,7 @@ func checkIfRouteComentGroup(comments []*ast.Comment) {
 				resp := strings.Split(response, ":")
 				respStruct := &Response{Description: `ok`, Content: &Content{ApplicationType: &ApplicationType{Schema: &Schema{Ref: `#/components/schemas/` + resp[1]}}}}
 				method.Responses[resp[0]] = respStruct
+				modelsUsed[resp[1]] = true
 
 			}
 		}
@@ -147,15 +157,22 @@ func parseModelsFromFile(fileName string) {
 				if model.Kind.String() == "type" {
 
 					decl := model.Decl.(*ast.TypeSpec)
-					structDecl := decl.Type.(*ast.StructType)
+					structDecl, ok := decl.Type.(*ast.StructType)
+					if !ok {
+						return
+					}
 					fields := structDecl.Fields.List
 
 					for _, field := range fields {
 
 						if field.Tag != nil && strings.Contains(field.Tag.Value, "json:") {
 
-							fieldType := field.Type.(*ast.Ident).Name
+							safeCast, ok := field.Type.(*ast.Ident)
+							if !ok {
+								return
+							}
 
+							fieldType := safeCast.Name
 							if fieldType == "int" || fieldType == "float64" || fieldType == "float32"  {
 								fieldType = "number"
 							}
