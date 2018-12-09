@@ -205,7 +205,7 @@ func parseModelsFromFile(fileName string) {
 								fieldType = "number"
 							}
 
-							log.Println(fmt.Sprintf("types: %s", fieldType))
+
 							if yamlOutput.Components.Schema[model.Name] == nil {
 								yamlOutput.Components.Schema[model.Name] = &ModelSchema{Properties: make(map[string] *Properties)}
 							}
