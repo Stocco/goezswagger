@@ -5,6 +5,23 @@ info:
 openapi: 3.0.0
 paths:
   /v1/dummy/route:
+    get:
+      summary: create a dummy route
+      tags:
+      - list
+      responses:
+        "200":
+          description: ok
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MyDummyModelResponse'
+        "400":
+          description: ok
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MyDummyModelResponse'
     post:
       summary: create a dummy route
       tags:

@@ -20,9 +20,26 @@ func GenerateFile(filePath string) {
 
 	yamlOutput = &YamlOutput{Openapi: "3.0.0", Info: &Info{}, Paths: make(map[string] map[string] *Method), Components: &Components{Schema: make(map[string] *ModelSchema)}}
 
+	log.Println(fmt.Sprintf("Parsing main dir ..."))
 	parseHeaders(filePath)
 	parseModelsFromFile(filePath)
 	parseRoutesFromFile(filePath)
+
+	dirs, err := ioutil.ReadDir(filePath)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	for _, file := range dirs {
+		if file.IsDir() && file.Name()[:1] != "." && file.Name() != "vendor" {
+			log.Println(fmt.Sprintf("Parsing dir: %s ...", file.Name()))
+
+			parseHeaders(filePath + "/" + file.Name())
+			parseModelsFromFile(filePath + "/" + file.Name())
+			parseRoutesFromFile(filePath + "/" + file.Name())
+
+		}
+	}
 
 
 	bytes, err := yaml.Marshal(yamlOutput)
@@ -34,7 +51,9 @@ func GenerateFile(filePath string) {
 	if err != nil {
 		log.Fatal(err.Error())
 	}
-	log.Println(fmt.Sprintf("%s", bytes))
+
+
+	log.Println(fmt.Sprintf("Parse completed. File generate at project dir: generated_swagger.yaml"))
 
 }
 
@@ -126,18 +145,23 @@ func parseModelsFromFile(fileName string) {
 			for _, model := range f.Scope.Objects {
 
 				if model.Kind.String() == "type" {
+
 					decl := model.Decl.(*ast.TypeSpec)
 					structDecl := decl.Type.(*ast.StructType)
 					fields := structDecl.Fields.List
-					yamlOutput.Components.Schema[model.Name] = &ModelSchema{Properties: make(map[string] *Properties)}
 
 					for _, field := range fields {
 
-						if field.Tag != nil && strings.Contains(field.Tag.Value, "json") {
+						if field.Tag != nil && strings.Contains(field.Tag.Value, "json:") {
 
 							fieldType := field.Type.(*ast.Ident).Name
+
 							if fieldType == "int" || fieldType == "float64" || fieldType == "float32"  {
 								fieldType = "number"
+							}
+
+							if yamlOutput.Components.Schema[model.Name] == nil {
+								yamlOutput.Components.Schema[model.Name] = &ModelSchema{Properties: make(map[string] *Properties)}
 							}
 
 							yamlOutput.Components.Schema[model.Name].Properties[extractKey(field.Tag.Value, "json")] = &Properties{Type: fieldType, Description: extractKey(field.Tag.Value, "description")}
