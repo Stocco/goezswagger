@@ -14,8 +14,23 @@ import (
 var (
 	yamlOutput *YamlOutput
 	modelsUsed map[string] bool
+
+	builtInTypes map[string]string
 )
 
+func init() {
+	builtInTypes = make(map[string]string)
+
+	builtInTypes[`int`] = ""
+	builtInTypes[`int64`] = ""
+	builtInTypes[`uint8`] = ""
+	builtInTypes[`float32`] = ""
+	builtInTypes[`float64`] = ""
+	builtInTypes[`string`] = ""
+	builtInTypes[`map`] = ""
+	builtInTypes[`bool`] = ""
+	builtInTypes[`boolean`] = ""
+}
 
 func GenerateFile(filePath string) {
 
@@ -167,21 +182,36 @@ func parseModelsFromFile(fileName string) {
 
 						if field.Tag != nil && strings.Contains(field.Tag.Value, "json:") {
 
-							safeCast, ok := field.Type.(*ast.Ident)
-							if !ok {
+							safeCast, okIdent := field.Type.(*ast.Ident)
+							safePointerCast, okStarExrp := field.Type.(*ast.StarExpr)
+							if !okIdent && !okStarExrp {
 								return
 							}
 
-							fieldType := safeCast.Name
+							var fieldType string
+							if safeCast == nil {
+								fieldType = safePointerCast.X.(*ast.Ident).Name
+							} else {
+								fieldType = safeCast.Name
+							}
+
+							_, builtin := builtInTypes[fieldType]
+
 							if fieldType == "int" || fieldType == "float64" || fieldType == "float32"  {
 								fieldType = "number"
 							}
 
+							log.Println(fmt.Sprintf("types: %s", fieldType))
 							if yamlOutput.Components.Schema[model.Name] == nil {
 								yamlOutput.Components.Schema[model.Name] = &ModelSchema{Properties: make(map[string] *Properties)}
 							}
 
-							yamlOutput.Components.Schema[model.Name].Properties[extractKey(field.Tag.Value, "json")] = &Properties{Type: fieldType, Description: extractKey(field.Tag.Value, "description")}
+							if builtin {
+								yamlOutput.Components.Schema[model.Name].Properties[extractKey(field.Tag.Value, "json")] = &Properties{Type: fieldType, Description: extractKey(field.Tag.Value, "description")}
+							} else {
+								yamlOutput.Components.Schema[model.Name].Properties[extractKey(field.Tag.Value, "json")] = &Properties{Ref: `#/components/schemas/` + fieldType}
+								modelsUsed[fieldType] = true
+							}
 						}
 
 					}
@@ -268,3 +298,4 @@ func retrieveKeyFromAstFile(key string, ast *ast.File) string {
 
 	return ""
 }
+

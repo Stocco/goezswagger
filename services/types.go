@@ -17,8 +17,9 @@ type ModelSchema struct {
 }
 
 type Properties struct {
-	Type string
-	Description string
+	Type string `yaml:"type,omitempty"`
+	Description string `yaml:"description,omitempty"`
+	Ref  string `yaml:"$ref,omitempty"`
 }
 
 type Examples struct {

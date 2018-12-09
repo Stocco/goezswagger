@@ -48,9 +48,10 @@ components:
   schemas:
     MyDummyModel:
       properties:
+        aeho:
+          $ref: '#/components/schemas/NestedVal'
         field_four:
           type: string
-          description: ""
         field_one:
           type: string
           description: field is the number one
@@ -58,7 +59,13 @@ components:
       properties:
         amount:
           type: number
-          description: ""
         amount_double:
           type: number
-          description: ""
+    NestedVal:
+      properties:
+        field:
+          type: string
+        field_x:
+          type: string
+        field_y:
+          type: number

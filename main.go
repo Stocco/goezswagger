@@ -29,10 +29,17 @@ func dummyRoute() {
 
 
 type MyDummyModel struct {
-	FieldOne	             string `json:"field_one" description:"field is the number one" validate:"required"`
-	FieldTwoNotMapped        string `validate:"required"`
+	FieldOne	             *string `json:"field_one" description:"field is the number one" validate:"required"`
+	FieldTwoNotMapped        *string `validate:"required"`
 	FieldThreeForgotten      string
 	FieldFour			      string `json:"field_four"`
+	FieldFive			      NestedVal `json:"aeho"`
+}
+
+type NestedVal struct {
+	FieldX		string `json:"field_x"`
+	FieldY		int `json:"field_y"`
+	Field		string  `json:"field"`
 }
 
 type MyDummyModelResponse struct {
