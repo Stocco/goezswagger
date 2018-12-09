@@ -30,7 +30,7 @@ func dummyRoute() {
 
 
 type MyDummyModel struct {
-	FieldOne	             string `json:"field_one" validate:"required"`
+	FieldOne	             string `json:"field_one" description:"field is the number one" validate:"required"`
 	FieldTwoNotMapped        string `validate:"required"`
 	FieldThreeForgotten      string
 	FieldFour			      string `json:"field_four"`

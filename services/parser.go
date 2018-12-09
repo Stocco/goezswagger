@@ -140,7 +140,7 @@ func parseModelsFromFile(fileName string) {
 								fieldType = "number"
 							}
 
-							yamlOutput.Components.Schema[model.Name].Properties[parseJsonName(field.Tag.Value)] = &Properties{Type: fieldType}
+							yamlOutput.Components.Schema[model.Name].Properties[extractKey(field.Tag.Value, "json")] = &Properties{Type: fieldType, Description: extractKey(field.Tag.Value, "description")}
 						}
 
 					}
@@ -151,22 +151,21 @@ func parseModelsFromFile(fileName string) {
 		}
 	}
 }
-func parseJsonName(fieldTag string) string {
+func extractKey(fieldTag string, key string) string {
+
+	if strings.Index(fieldTag, key) < 0 {
+		return ""
+	}
 
 	value := ""
-	spaces := strings.Split(fieldTag, " ")
-	if len(spaces) == 1 {
-		value = spaces[0][7: len(spaces[0]) - 2]
-	} else {
-
-		for _, v := range spaces {
-			if strings.Contains(v, "json") {
-				value = v[6: len(v) - 1]
-				value = strings.Replace(value, `"`, "", -1)
-			}
+	for pos := strings.Index(fieldTag, key) + len(key) + 2; pos < len(fieldTag) ; pos++ {
+		if fieldTag[pos:pos + 1] == `"` {
+			return value
 		}
 
+		value = value + fieldTag[pos:pos + 1]
 	}
+
 	return  value
 }
 

@@ -36,7 +36,7 @@ components:
           description: ""
         field_one:
           type: string
-          description: ""
+          description: field is the number one
     MyDummyModelResponse:
       properties:
         amount:
