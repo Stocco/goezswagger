@@ -20,6 +20,7 @@ type Properties struct {
 	Type string `yaml:"type,omitempty"`
 	Description string `yaml:"description,omitempty"`
 	Ref  string `yaml:"$ref,omitempty"`
+	Items *Schema `yaml:"items,omitempty"`
 }
 
 type Examples struct {
@@ -52,7 +53,8 @@ type ApplicationType struct {
 }
 
 type Schema struct {
-	Ref string  `yaml:"$ref"`
+	Ref string  `yaml:"$ref,omitempty"`
+	Type string `yaml:"type,omitempty"`
 }
 
 

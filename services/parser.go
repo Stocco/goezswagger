@@ -21,15 +21,15 @@ var (
 
 func init() {
 	golangNumeric = make(map[string]string)
-	golangNumeric["int"] = "number"
-	golangNumeric["int8"] = "number"
-	golangNumeric["int16"] = "number"
-	golangNumeric["int32"] = "number"
-	golangNumeric["int64"] = "number"
-	golangNumeric["uint8"] = "number"
-	golangNumeric["uint16"] = "number"
-	golangNumeric["uint32"] = "number"
-	golangNumeric["uint64"] = "number"
+	golangNumeric["int"] = "integer"
+	golangNumeric["int8"] = "integer"
+	golangNumeric["int16"] = "integer"
+	golangNumeric["int32"] = "integer"
+	golangNumeric["int64"] = "integer"
+	golangNumeric["uint8"] = "integer"
+	golangNumeric["uint16"] = "integer"
+	golangNumeric["uint32"] = "integer"
+	golangNumeric["uint64"] = "integer"
 	golangNumeric["float64"] = "number"
 	golangNumeric["float32"] = "number"
 
@@ -61,25 +61,19 @@ func GenerateFile(filePath string) {
 		}
 	}
 
-	for k, _ := range yamlOutput.Components.Schema {
-		_, used := modelsUsed[k]
-		if !used {
-			delete(yamlOutput.Components.Schema, k)
-		}
-	}
-
 	bytes, err := yaml.Marshal(yamlOutput)
 	if err != nil {
 		log.Fatal(err.Error())
 	}
 
-	err = ioutil.WriteFile("./generated_swagger.yaml", bytes, 0644)
+
+	err = ioutil.WriteFile("./generated_swagger.yaml", bytes, 0400)
 	if err != nil {
 		log.Fatal(err.Error())
 	}
 
 
-	log.Println(fmt.Sprintf("Parse completed. Models used [%v] File generate at project dir: generated_swagger.yaml", modelsUsed))
+	log.Println(fmt.Sprintf("Parse completed. File generate at project dir: generated_swagger.yaml"))
 
 }
 
@@ -186,25 +180,44 @@ func parseModelsFromFile(fileName string) {
 						if field.Tag != nil && strings.Contains(field.Tag.Value, "json:") {
 
 							safeCast, okIdent := field.Type.(*ast.Ident)
-							safePointerCast, okStarExrp := field.Type.(*ast.StarExpr)
-							if !okIdent && !okStarExrp {
+							safePointerCast, okStarExpr := field.Type.(*ast.StarExpr)
+							safeMapCast, okMap := field.Type.(*ast.MapType)
+							safeArrayCast, okArray := field.Type.(*ast.ArrayType)
+							safeSelectorCast, okSelector := field.Type.(*ast.SelectorExpr)
+							safeInterfaceCast, okInterface := field.Type.(*ast.InterfaceType)
+
+							if !okIdent && !okStarExpr && !okMap && !okArray && !okSelector && !okInterface {
 								return
 							}
 
 							var fieldType string
-							if safeCast == nil {
-								fieldType = safePointerCast.X.(*ast.Ident).Name
-							} else {
+							if safeCast != nil {
 								fieldType = safeCast.Name
+							} else if safePointerCast  != nil {
+
+								switch v := safePointerCast.X.(type) {
+									case *ast.ArrayType:
+										fieldType = "array"
+										safeArrayCast = v
+									case *ast.Ident:
+										fieldType = v.Name
+									case *ast.SelectorExpr:
+										fieldType = "string"
+								}
+
+							} else if safeMapCast != nil {
+								fieldType = "object"
+							} else if safeArrayCast != nil {
+								fieldType = "array"
+							} else if safeSelectorCast != nil {
+								fieldType = "string"
+							} else if safeInterfaceCast != nil {
+								fieldType = "object"
 							}
+
 
 							builtin := isBasicType(fieldType)
-
-							_, isNumber := golangNumeric[fieldType]
-							if isNumber {
-								fieldType = "number"
-							}
-
+							fieldType = correctFileTypeName(fieldType)
 
 							if yamlOutput.Components.Schema[model.Name] == nil {
 								yamlOutput.Components.Schema[model.Name] = &ModelSchema{Properties: make(map[string] *Properties)}
@@ -212,6 +225,28 @@ func parseModelsFromFile(fileName string) {
 
 							if builtin {
 								yamlOutput.Components.Schema[model.Name].Properties[extractKey(field.Tag.Value, "json")] = &Properties{Type: fieldType, Description: extractKey(field.Tag.Value, "description")}
+							} else if fieldType == "array" {
+
+								switch v := safeArrayCast.Elt.(type) {
+								case *ast.StarExpr:
+									yamlOutput.Components.Schema[model.Name].Properties[extractKey(field.Tag.Value, "json")] = &Properties{Type: fieldType, Items: &Schema{Ref: `#/components/schemas/` + v.X.(*ast.Ident).Name}}
+								case *ast.Ident:
+									if isBasicType(v.Name) {
+										yamlOutput.Components.Schema[model.Name].Properties[extractKey(field.Tag.Value, "json")] = &Properties{Type: fieldType, Items: &Schema{Type: correctFileTypeName(v.Name)}}
+									} else {
+										yamlOutput.Components.Schema[model.Name].Properties[extractKey(field.Tag.Value, "json")] = &Properties{Type: fieldType, Items: &Schema{Ref: `#/components/schemas/` + v.Name}}
+									}
+								case *ast.InterfaceType:
+									yamlOutput.Components.Schema[model.Name].Properties[extractKey(field.Tag.Value, "json")] = &Properties{Type: fieldType, Items: &Schema{Type: "object"}}
+								case *ast.MapType:
+									yamlOutput.Components.Schema[model.Name].Properties[extractKey(field.Tag.Value, "json")] = &Properties{Type: fieldType, Items: &Schema{Type: "object"}}
+								case *ast.SelectorExpr:
+									yamlOutput.Components.Schema[model.Name].Properties[extractKey(field.Tag.Value, "json")] = &Properties{Type: fieldType, Items: &Schema{Type: "string"}}
+								}
+
+
+							} else if fieldType == "object" {
+								yamlOutput.Components.Schema[model.Name].Properties[extractKey(field.Tag.Value, "json")] = &Properties{Type: fieldType}
 							} else {
 								yamlOutput.Components.Schema[model.Name].Properties[extractKey(field.Tag.Value, "json")] = &Properties{Ref: `#/components/schemas/` + fieldType}
 								modelsUsed[fieldType] = true
@@ -234,7 +269,7 @@ func extractKey(fieldTag string, key string) string {
 
 	value := ""
 	for pos := strings.Index(fieldTag, key) + len(key) + 2; pos < len(fieldTag) ; pos++ {
-		if fieldTag[pos:pos + 1] == `"` {
+		if fieldTag[pos:pos + 1] == `"` || fieldTag[pos:pos + 1] == `,` {
 			return value
 		}
 
@@ -312,4 +347,21 @@ func isBasicType(typeString string) bool {
 	}
 
 	return false
+}
+
+func correctFileTypeName(fieldType string) string {
+
+	correctFieldName := fieldType
+
+	numberSwagger, isNumber := golangNumeric[fieldType]
+	if isNumber {
+		correctFieldName = numberSwagger
+	}
+
+	if correctFieldName == "bool" {
+		correctFieldName = "boolean"
+	}
+
+	return correctFieldName
+
 }
