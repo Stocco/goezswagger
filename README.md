@@ -36,7 +36,7 @@ Then simply add the annotation routes you want  anywhere in your code! (Just for
 	- method annotation value should be in lower case   
 
 //@path `your-api-path`  
-//@method `method`
+//@method `method` . 
 //@summary `summary of your api route`  
 //@tags `create`  
 //@request `MyDummyModel`  
