@@ -1,0 +1,3 @@
+package: ezswag
+import:
+- package: gopkg.in/yaml.v2

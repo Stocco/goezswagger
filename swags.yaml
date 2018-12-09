@@ -1,0 +1,41 @@
+info:
+  title: goezswag api
+  version: 1.0.0-beta
+  description: goezswag is a easy swagger
+openapi: 3.0.0
+paths:
+  /v1/dummy/route:
+    post:
+      summary: create a dummy route
+      tags:
+      - create
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MyDummyModel'
+      responses:
+        "200":
+          description: ok
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MyDummyModelResponse'
+components:
+  schemas:
+    MyDummyModel:
+      properties:
+        field_four:
+          type: string
+          description: ""
+        field_one:
+          type: string
+          description: ""
+    MyDummyModelResponse:
+      properties:
+        amount:
+          type: number
+          description: ""
+        amount_double:
+          type: number
+          description: ""

@@ -1,0 +1,62 @@
+package services
+
+type YamlOutput struct {
+	Info *Info
+	Openapi string
+	Paths map[string] map[string] *Method
+	Components *Components
+}
+
+type Components struct{
+	Schema map[string] *ModelSchema `yaml:"schemas"`
+}
+
+type ModelSchema struct {
+	Properties map[string] *Properties
+	Examples   map[string] *Examples `yaml:"examples,omitempty"`
+}
+
+type Properties struct {
+	Type string
+	Description string
+}
+
+type Examples struct {
+
+}
+
+
+type Method struct {
+	Summary string
+	Tags []string
+	RequestBody *RequestBody `yaml:"requestBody,omitempty"`
+	Responses map[string] *Response
+}
+
+type RequestBody struct {
+	Content *Content `yaml:"content"`
+}
+
+type Response struct {
+	Description string
+	Content *Content `yaml:"content,omitempty"`
+}
+
+type Content struct {
+	ApplicationType *ApplicationType `yaml:"application/json"`
+}
+
+type ApplicationType struct {
+	Schema *Schema `yaml:"schema"`
+}
+
+type Schema struct {
+	Ref string  `yaml:"$ref"`
+}
+
+
+type Info struct {
+	Title string
+	Version string
+	Description string
+}
