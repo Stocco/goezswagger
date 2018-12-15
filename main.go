@@ -29,27 +29,27 @@ func dummyRoute() {
 
 //@model MyDummyModel
 type MyDummyModel struct {
-	FieldOne	             *string `json:"field_one,omitempty" description:"field is the number one" validate:"required"`
+	FieldOne	             *string `json:"field_one,omitempty" description:"field is the number one"`
 	FieldTwoNotMapped        *string `validate:"required"`
 	FieldThreeForgotten      string
-	FieldFour			      string `json:"field_four"`
-	FieldFive			      NestedVal `json:"aeho"`
+	FieldFour			      string `json:"field_four" description:"field is the number four"`
+	FieldFive			      NestedVal `json:"aeho" description:"this is a composite value"`
 	FieldFiveArray			  []*NestedVal `json:"aeho_arrat"`
 	IncReq					  IncomingTransferRequest `json:"inc_request"`
 }
 
 //@model NestedVal
 type NestedVal struct {
-	FieldX		string `json:"field_x"`
-	FieldY		int `json:"field_y"`
-	FieldZeta	uint64  `json:"field_zeta"`
-	FieldBool	bool `json:"field_bool"`
+	FieldX		string `json:"field_x" description:"field x is the best" example:"best"`
+	FieldY		int `json:"field_y" description:"field y is integer" example:"-42"`
+	FieldZeta	uint64  `json:"field_zeta" description:"field is always positive" example:"1"`
+	FieldBool	bool `json:"field_bool" description:"field bool is always boolean" example:"true"`
 }
 
 //@model MyDummyModelResponse
 type MyDummyModelResponse struct {
 	Amount int		`json:"amount"`
-	AmountDouble float64 `json:"amount_double"`
+	AmountDouble float64 `json:"amount_double" description:"field double is of course doubl" example:"53.21"`
 }
 
 //@model IncomingTransferRequest

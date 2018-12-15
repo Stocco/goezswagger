@@ -13,7 +13,7 @@ type Components struct{
 
 type ModelSchema struct {
 	Properties map[string] *Properties
-	Examples   map[string] *Examples `yaml:"examples,omitempty"`
+	Example   map[string] interface{} `yaml:"example,omitempty"`
 }
 
 type Properties struct {
@@ -21,10 +21,6 @@ type Properties struct {
 	Description string `yaml:"description,omitempty"`
 	Ref  string `yaml:"$ref,omitempty"`
 	Items *Schema `yaml:"items,omitempty"`
-}
-
-type Examples struct {
-
 }
 
 

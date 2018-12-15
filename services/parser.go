@@ -9,6 +9,7 @@ import (
 	"gopkg.in/yaml.v2"
 	"io/ioutil"
 	"log"
+	"strconv"
 	"strings"
 )
 
@@ -248,7 +249,7 @@ func parseAnottatedModel(modelName string, fileName string) {
 							fieldType = correctFileTypeName(fieldType)
 
 							if yamlOutput.Components.Schema[model.Name] == nil {
-								yamlOutput.Components.Schema[model.Name] = &ModelSchema{Properties: make(map[string] *Properties)}
+								yamlOutput.Components.Schema[model.Name] = &ModelSchema{Properties: make(map[string] *Properties), Example: make(map[string] interface{})}
 							}
 
 							if builtin {
@@ -257,27 +258,49 @@ func parseAnottatedModel(modelName string, fileName string) {
 
 								switch v := safeArrayCast.Elt.(type) {
 								case *ast.StarExpr:
-									yamlOutput.Components.Schema[model.Name].Properties[extractKey(field.Tag.Value, "json")] = &Properties{Type: fieldType, Items: &Schema{Ref: `#/components/schemas/` + v.X.(*ast.Ident).Name}}
+									yamlOutput.Components.Schema[model.Name].Properties[extractKey(field.Tag.Value, "json")] = &Properties{Type: fieldType, Items: &Schema{Ref: `#/components/schemas/` + v.X.(*ast.Ident).Name}, Description: extractKey(field.Tag.Value, "description")}
 								case *ast.Ident:
 									if isBasicType(v.Name) {
-										yamlOutput.Components.Schema[model.Name].Properties[extractKey(field.Tag.Value, "json")] = &Properties{Type: fieldType, Items: &Schema{Type: correctFileTypeName(v.Name)}}
+										yamlOutput.Components.Schema[model.Name].Properties[extractKey(field.Tag.Value, "json")] = &Properties{Type: fieldType, Items: &Schema{Type: correctFileTypeName(v.Name)}, Description: extractKey(field.Tag.Value, "description")}
 									} else {
-										yamlOutput.Components.Schema[model.Name].Properties[extractKey(field.Tag.Value, "json")] = &Properties{Type: fieldType, Items: &Schema{Ref: `#/components/schemas/` + v.Name}}
+										yamlOutput.Components.Schema[model.Name].Properties[extractKey(field.Tag.Value, "json")] = &Properties{Type: fieldType, Items: &Schema{Ref: `#/components/schemas/` + v.Name}, Description: extractKey(field.Tag.Value, "description")}
 									}
 								case *ast.InterfaceType:
-									yamlOutput.Components.Schema[model.Name].Properties[extractKey(field.Tag.Value, "json")] = &Properties{Type: fieldType, Items: &Schema{Type: "object"}}
+									yamlOutput.Components.Schema[model.Name].Properties[extractKey(field.Tag.Value, "json")] = &Properties{Type: fieldType, Items: &Schema{Type: "object"}, Description: extractKey(field.Tag.Value, "description")}
 								case *ast.MapType:
-									yamlOutput.Components.Schema[model.Name].Properties[extractKey(field.Tag.Value, "json")] = &Properties{Type: fieldType, Items: &Schema{Type: "object"}}
+									yamlOutput.Components.Schema[model.Name].Properties[extractKey(field.Tag.Value, "json")] = &Properties{Type: fieldType, Items: &Schema{Type: "object"}, Description: extractKey(field.Tag.Value, "description")}
 								case *ast.SelectorExpr:
-									yamlOutput.Components.Schema[model.Name].Properties[extractKey(field.Tag.Value, "json")] = &Properties{Type: fieldType, Items: &Schema{Type: "string"}}
+									yamlOutput.Components.Schema[model.Name].Properties[extractKey(field.Tag.Value, "json")] = &Properties{Type: fieldType, Items: &Schema{Type: "string"}, Description: extractKey(field.Tag.Value, "description")}
 								}
 
 
 							} else if fieldType == "object" {
-								yamlOutput.Components.Schema[model.Name].Properties[extractKey(field.Tag.Value, "json")] = &Properties{Type: fieldType}
+								yamlOutput.Components.Schema[model.Name].Properties[extractKey(field.Tag.Value, "json")] = &Properties{Type: fieldType, Description: extractKey(field.Tag.Value, "description")}
 							} else {
-								yamlOutput.Components.Schema[model.Name].Properties[extractKey(field.Tag.Value, "json")] = &Properties{Ref: `#/components/schemas/` + fieldType}
+								yamlOutput.Components.Schema[model.Name].Properties[extractKey(field.Tag.Value, "json")] = &Properties{Ref: `#/components/schemas/` + fieldType, Description: extractKey(field.Tag.Value, "description")}
 							}
+
+							if strings.Contains(field.Tag.Value, "example:") {
+								exampleValue := extractKey(field.Tag.Value, "example")
+
+								if exampleValue == "true" || exampleValue == "false" {
+									yamlOutput.Components.Schema[model.Name].Example[extractKey(field.Tag.Value, "json")] = exampleValue == "true"
+									return
+								}
+
+								if num, err := strconv.Atoi(exampleValue) ; err == nil {
+									yamlOutput.Components.Schema[model.Name].Example[extractKey(field.Tag.Value, "json")] = num
+									return
+								}
+
+								if fl, err := strconv.ParseFloat(exampleValue, 10); err == nil {
+									yamlOutput.Components.Schema[model.Name].Example[extractKey(field.Tag.Value, "json")] = fl
+									return
+								}
+
+								yamlOutput.Components.Schema[model.Name].Example[extractKey(field.Tag.Value, "json")] = exampleValue
+							}
+
 						}
 
 					}

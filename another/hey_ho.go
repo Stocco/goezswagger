@@ -5,7 +5,7 @@ package another
 //@method get
 //@summary create a dummy route
 //@tags list
-//@response 200:MyDummyModelResponse 400:MyDummyModelResponse
+//@response 200:AccountHolder 400:Paymentz 500:MyDummyModelResponse
 func anotherPackage() {
 
 }
