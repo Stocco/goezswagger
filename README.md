@@ -13,6 +13,7 @@ For this beta version the annotations order matters so follow the examples .
 
 Your structs should match the golang pattern like in the example bellow:
 
+    //@model MyDummyModel
     type MyDummyModel struct {
     	FieldOne	             string `json:"field_one" description:"field is the number one" validate:"required"`
     	FieldTwoNotMapped        string `validate:"required"`
@@ -20,13 +21,13 @@ Your structs should match the golang pattern like in the example bellow:
     	FieldFour			      string `json:"field_four"`
     }
 
-The mapper will use the fields that are annotated with `json`, plus the description (if provided)
+The mapper will use your annottated models with only the fields that are annotated with `json`, plus the description (if provided)
 
 Then simply add the annotation routes you want  anywhere in your code! (Just for the sake of organization, add above the handlers...)  
 
 	- currently tags are in alpha ( it should be a list with empty spaces (create list get ...))
 
-	- the request and response fields should map to an existing model in your project.
+	- the request and response fields should map to an existing annotated model in your project.
 	    they will map all your fields tagged with json
 	
 	- The response field should be a list of key:value separated with empt, like on the example below.  

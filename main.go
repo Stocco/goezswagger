@@ -27,7 +27,7 @@ func dummyRoute() {
 	log.Println("HEY THERE")
 }
 
-
+//@model MyDummyModel
 type MyDummyModel struct {
 	FieldOne	             *string `json:"field_one,omitempty" description:"field is the number one" validate:"required"`
 	FieldTwoNotMapped        *string `validate:"required"`
@@ -38,6 +38,7 @@ type MyDummyModel struct {
 	IncReq					  IncomingTransferRequest `json:"inc_request"`
 }
 
+//@model NestedVal
 type NestedVal struct {
 	FieldX		string `json:"field_x"`
 	FieldY		int `json:"field_y"`
@@ -45,11 +46,13 @@ type NestedVal struct {
 	FieldBool	bool `json:"field_bool"`
 }
 
+//@model MyDummyModelResponse
 type MyDummyModelResponse struct {
 	Amount int		`json:"amount"`
 	AmountDouble float64 `json:"amount_double"`
 }
 
+//@model IncomingTransferRequest
 type IncomingTransferRequest struct {
 	Holden		      *AccountHolder     `json:"source_holder"`
 	Paymentz	      *Paymentz          `json:"payment_details"`
@@ -57,15 +60,18 @@ type IncomingTransferRequest struct {
 	Metadata          map[string]string  `json:"metadata"`
 }
 
+//@model AccountHolder
 type AccountHolder struct {
 	Name             string       `json:"name,omitempty"`
 	BankAccount      *BankAc `json:"bankaccount"`
 }
 
+//@model BankAc
 type BankAc struct {
 	Destination   *bool  `json:"destination,omitempty"`
 }
 
+//@model Paymentz
 type Paymentz struct {
 	Type             string  `json:"type,omitempty"`
 }

@@ -14,8 +14,6 @@ import (
 
 var (
 	yamlOutput *YamlOutput
-	modelsUsed map[string] bool
-
 	golangNumeric map[string]string
 )
 
@@ -38,11 +36,10 @@ func init() {
 func GenerateFile(filePath string) {
 
 	yamlOutput = &YamlOutput{Openapi: "3.0.0", Info: &Info{}, Paths: make(map[string] map[string] *Method), Components: &Components{Schema: make(map[string] *ModelSchema)}}
-	modelsUsed = make(map[string]bool)
 
 	log.Println(fmt.Sprintf("Parsing main dir ..."))
 	parseHeaders(filePath)
-	parseModelsFromFile(filePath)
+	getAnnotatedModels(filePath)
 	parseRoutesFromFile(filePath)
 
 	dirs, err := ioutil.ReadDir(filePath)
@@ -55,7 +52,7 @@ func GenerateFile(filePath string) {
 			log.Println(fmt.Sprintf("Parsing dir: %s ...", file.Name()))
 
 			parseHeaders(filePath + "/" + file.Name())
-			parseModelsFromFile(filePath + "/" + file.Name())
+			getAnnotatedModels(filePath + "/" + file.Name())
 			parseRoutesFromFile(filePath + "/" + file.Name())
 
 		}
@@ -118,7 +115,6 @@ func checkIfRouteComentGroup(comments []*ast.Comment) {
 
 		if pos := findKeyInComments("//@request", comments) ; pos > 0 {
 			method.RequestBody = &RequestBody{Content: &Content{ApplicationType: &ApplicationType{Schema: &Schema{Ref: `#/components/schemas/` + strings.TrimSpace(comments[pos].Text[len("//@request")+1:])}}}}
-			modelsUsed[strings.TrimSpace(comments[pos].Text[len("//@request")+1:])] = true
 		}
 
 
@@ -129,7 +125,6 @@ func checkIfRouteComentGroup(comments []*ast.Comment) {
 				resp := strings.Split(response, ":")
 				respStruct := &Response{Description: `ok`, Content: &Content{ApplicationType: &ApplicationType{Schema: &Schema{Ref: `#/components/schemas/` + resp[1]}}}}
 				method.Responses[resp[0]] = respStruct
-				modelsUsed[resp[1]] = true
 
 			}
 		}
@@ -153,20 +148,53 @@ func checkIfRouteComentGroup(comments []*ast.Comment) {
 
 
 
-func parseModelsFromFile(fileName string) {
+func getAnnotatedModels(fileName string) {
+	fset := token.NewFileSet()
+	astr, err := parser.ParseDir(fset, fileName, nil, parser.ParseComments)
+	if err != nil {
+		log.Fatal(err.Error())
+	}
+
+	for _, astt := range astr {
+		for _, f := range astt.Files  {
+			for _, modelName := range retrieveAnnotatedNames("//@model", f) {
+				log.Println(fmt.Sprintf("Found model %s", modelName))
+				parseAnottatedModel(modelName, fileName)
+			}
+		}
+	}
+}
+
+func retrieveAnnotatedNames(key string, ast *ast.File) []string {
+
+	var modelNames []string
+	for _, cg := range ast.Comments {
+
+		for _, v := range cg.List {
+
+			if strings.Contains(strings.ToLower(v.Text), key) {
+				modelNames = append(modelNames, strings.TrimSpace(v.Text[len(key):]))
+			}
+
+		}
+
+	}
+
+	return modelNames
+}
+
+func parseAnottatedModel(modelName string, fileName string) {
+
 	fset := token.NewFileSet()
 	astr, err := parser.ParseDir(fset, fileName, nil, 0)
 	if err != nil {
 		log.Fatal(err.Error())
 	}
 
-
 	for _, astt := range astr {
 		for _, f := range astt.Files  {
-
 			for _, model := range f.Scope.Objects {
-
-				if model.Kind.String() == "type" {
+				if model.Name == modelName {
 
 					decl := model.Decl.(*ast.TypeSpec)
 					structDecl, ok := decl.Type.(*ast.StructType)
@@ -196,13 +224,13 @@ func parseModelsFromFile(fileName string) {
 							} else if safePointerCast  != nil {
 
 								switch v := safePointerCast.X.(type) {
-									case *ast.ArrayType:
-										fieldType = "array"
-										safeArrayCast = v
-									case *ast.Ident:
-										fieldType = v.Name
-									case *ast.SelectorExpr:
-										fieldType = "string"
+								case *ast.ArrayType:
+									fieldType = "array"
+									safeArrayCast = v
+								case *ast.Ident:
+									fieldType = v.Name
+								case *ast.SelectorExpr:
+									fieldType = "string"
 								}
 
 							} else if safeMapCast != nil {
@@ -249,18 +277,17 @@ func parseModelsFromFile(fileName string) {
 								yamlOutput.Components.Schema[model.Name].Properties[extractKey(field.Tag.Value, "json")] = &Properties{Type: fieldType}
 							} else {
 								yamlOutput.Components.Schema[model.Name].Properties[extractKey(field.Tag.Value, "json")] = &Properties{Ref: `#/components/schemas/` + fieldType}
-								modelsUsed[fieldType] = true
 							}
 						}
 
 					}
-
 
 				}
 			}
 		}
 	}
 }
+
 func extractKey(fieldTag string, key string) string {
 
 	if strings.Index(fieldTag, key) < 0 {
