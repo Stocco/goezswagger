@@ -115,7 +115,14 @@ func checkIfRouteComentGroup(comments []*ast.Comment) {
 		}
 
 		if pos := findKeyInComments("//@request", comments) ; pos > 0 {
-			method.RequestBody = &RequestBody{Content: &Content{ApplicationType: &ApplicationType{Schema: &Schema{Ref: `#/components/schemas/` + strings.TrimSpace(comments[pos].Text[len("//@request")+1:])}}}}
+			reqName := strings.TrimSpace(comments[pos].Text[len("//@request")+1:])
+			if strings.Contains(reqName, "[]") {
+				requestWithoutArray := strings.Replace(reqName, "[]", "", 1)
+				method.RequestBody = &RequestBody{Content: &Content{ApplicationType: &ApplicationType{Schema: &Schema{Type: "array", SchemaItems: &SchemaItems{Ref: `#/components/schemas/` + requestWithoutArray}}}}}
+			} else {
+				method.RequestBody = &RequestBody{Content: &Content{ApplicationType: &ApplicationType{Schema: &Schema{Ref: `#/components/schemas/` + reqName}}}}
+			}
+
 		}
 
 
@@ -124,8 +131,15 @@ func checkIfRouteComentGroup(comments []*ast.Comment) {
 			method.Responses = make(map[string] *Response)
 			for _, response := range strings.Split(comments[pos].Text[len("//@response") + 1:], " ") {
 				resp := strings.Split(response, ":")
-				respStruct := &Response{Description: `ok`, Content: &Content{ApplicationType: &ApplicationType{Schema: &Schema{Ref: `#/components/schemas/` + resp[1]}}}}
-				method.Responses[resp[0]] = respStruct
+
+				if strings.Contains(resp[1], "[]") {
+					responseWithoutArray := strings.Replace(resp[1], "[]", "", 1)
+					method.Responses[resp[0]] = &Response{Description: `ok`, Content: &Content{ApplicationType: &ApplicationType{Schema: &Schema{Type: "array", SchemaItems:&SchemaItems{Ref: `#/components/schemas/` + responseWithoutArray}}}}}
+				} else {
+					method.Responses[resp[0]] = &Response{Description: `ok`, Content: &Content{ApplicationType: &ApplicationType{Schema: &Schema{Ref: `#/components/schemas/` + resp[1]}}}}
+				}
+
+
 
 			}
 		}
@@ -205,7 +219,6 @@ func parseAnottatedModel(modelName string, fileName string) {
 					fields := structDecl.Fields.List
 
 					for _, field := range fields {
-
 						if field.Tag != nil && strings.Contains(field.Tag.Value, "json:") {
 
 							safeCast, okIdent := field.Type.(*ast.Ident)
@@ -285,17 +298,17 @@ func parseAnottatedModel(modelName string, fileName string) {
 
 								if exampleValue == "true" || exampleValue == "false" {
 									yamlOutput.Components.Schema[model.Name].Example[extractKey(field.Tag.Value, "json")] = exampleValue == "true"
-									return
+									continue
 								}
 
 								if num, err := strconv.Atoi(exampleValue) ; err == nil {
 									yamlOutput.Components.Schema[model.Name].Example[extractKey(field.Tag.Value, "json")] = num
-									return
+									continue
 								}
 
 								if fl, err := strconv.ParseFloat(exampleValue, 10); err == nil {
 									yamlOutput.Components.Schema[model.Name].Example[extractKey(field.Tag.Value, "json")] = fl
-									return
+									continue
 								}
 
 								yamlOutput.Components.Schema[model.Name].Example[extractKey(field.Tag.Value, "json")] = exampleValue

@@ -33,12 +33,23 @@ Now to map your structs, they should use the golang pattern and have the `//@mod
 Now to map your routes, simply add the annotations below anywhere in your code! (Just for the sake of organization, add above the handlers...)
 
     //@path your-api-path  
-    //@method method
+    //@method post
     //@summary summary of your api route  
     //@tags create  
     //@request MyDummyModel  
-    //@response 200:MyDummyModelResponse 400:MyDummy400Model 500:MyDummy500Model    
+    //@response 200:[]MyDummyModelResponse 400:MyDummy400Model 500:MyDummy500Model
+    
+Another valid annotation
 
+    //@path your-api-path-2  
+    //@method get
+    //@summary summary of your api route 2  
+    //@tags list  
+    //@request []MyDummyModel  
+    //@response 200:MyDummyModelResponse 400:MyDummy400Model 500:MyDummy500Model            
+
+
+- You can transform your models into arrays by adding `[]` before the model name - this works for either request or response
 
 - currently tags are in alpha ( it should be a list with empty spaces (create list get ...))
 
