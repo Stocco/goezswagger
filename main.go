@@ -75,9 +75,9 @@ type IncomingTransferRequest struct {
 type AccountHolder struct {
 	Name        string  `json:"name,omitempty" description:"the name of the person" example:"renato"`
 	Surname     string  `json:"surname,omitempty" description:"the surname of the person" example:"stocco"`
+	BankAccount *BankAc `json:"bankaccount" description:"if person has bankaccount" example:"true"`
+	Weight      *float64 `json:"weight,omitempty" description:"the weight of this person" example:"73.2"`
 	Age         int     `json:"age,omitempty" description:"the age of the person" example:"25"`
-	Weight      float64 `json:"weight,omitempty" description:"the weight of this person" example:"73.2"`
-	BankAccount *BankAc `json:"bankaccount"`
 }
 
 //@model BankAc

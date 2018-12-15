@@ -219,7 +219,6 @@ func parseAnottatedModel(modelName string, fileName string) {
 					fields := structDecl.Fields.List
 
 					for _, field := range fields {
-
 						if field.Tag != nil && strings.Contains(field.Tag.Value, "json:") {
 
 							safeCast, okIdent := field.Type.(*ast.Ident)
@@ -299,17 +298,17 @@ func parseAnottatedModel(modelName string, fileName string) {
 
 								if exampleValue == "true" || exampleValue == "false" {
 									yamlOutput.Components.Schema[model.Name].Example[extractKey(field.Tag.Value, "json")] = exampleValue == "true"
-									return
+									continue
 								}
 
 								if num, err := strconv.Atoi(exampleValue) ; err == nil {
 									yamlOutput.Components.Schema[model.Name].Example[extractKey(field.Tag.Value, "json")] = num
-									return
+									continue
 								}
 
 								if fl, err := strconv.ParseFloat(exampleValue, 10); err == nil {
 									yamlOutput.Components.Schema[model.Name].Example[extractKey(field.Tag.Value, "json")] = fl
-									return
+									continue
 								}
 
 								yamlOutput.Components.Schema[model.Name].Example[extractKey(field.Tag.Value, "json")] = exampleValue

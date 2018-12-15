@@ -108,16 +108,24 @@ components:
         age:
           type: integer
           description: the age of the person
+        bankaccount:
+          description: if person has bankaccount
+          $ref: '#/components/schemas/BankAc'
         name:
           type: string
           description: the name of the person
         surname:
           type: string
           description: the surname of the person
+        weight:
+          type: number
+          description: the weight of this person
       example:
         age: 25
+        bankaccount: true
         name: renato
         surname: stocco
+        weight: 73.2
     BankAc:
       properties:
         destination:
@@ -160,15 +168,23 @@ components:
         amount_double: 53.21
     NestedVal:
       properties:
+        field_bool:
+          type: boolean
+          description: field bool is always boolean
         field_x:
           type: string
           description: field x is the best
         field_y:
           type: integer
           description: field y is integer
+        field_zeta:
+          type: integer
+          description: field is always positive
       example:
+        field_bool: true
         field_x: best
         field_y: -42
+        field_zeta: 1
     Paymentz:
       properties:
         type:
