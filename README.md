@@ -24,7 +24,7 @@ Now to map your structs, they should use the golang pattern and have the `//@mod
     	FieldFour			      string `json:"field_four" example:"you can add examples without descriptions"`
     }
 
-- The mapper will use your annottated models with only the fields that are annotated with `json`, plus the description and example (if provided)
+- The mapper will see only the fields that are annotated with `json`
 
 - Tags `description` and `example` are optionals. 
 
