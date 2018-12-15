@@ -134,9 +134,9 @@ func checkIfRouteComentGroup(comments []*ast.Comment) {
 
 				if strings.Contains(resp[1], "[]") {
 					responseWithoutArray := strings.Replace(resp[1], "[]", "", 1)
-					method.Responses[resp[0]] = &Response{Description: `ok`, Content: &Content{ApplicationType: &ApplicationType{Schema: &Schema{Type: "array", SchemaItems:&SchemaItems{Ref: `#/components/schemas/` + responseWithoutArray}}}}}
+					method.Responses[resp[0]] = &Response{Description: ``, Content: &Content{ApplicationType: &ApplicationType{Schema: &Schema{Type: "array", SchemaItems:&SchemaItems{Ref: `#/components/schemas/` + responseWithoutArray}}}}}
 				} else {
-					method.Responses[resp[0]] = &Response{Description: `ok`, Content: &Content{ApplicationType: &ApplicationType{Schema: &Schema{Ref: `#/components/schemas/` + resp[1]}}}}
+					method.Responses[resp[0]] = &Response{Description: ``, Content: &Content{ApplicationType: &ApplicationType{Schema: &Schema{Ref: `#/components/schemas/` + resp[1]}}}}
 				}
 
 
@@ -146,7 +146,7 @@ func checkIfRouteComentGroup(comments []*ast.Comment) {
 
 		if method.Responses == nil {
 			method.Responses = make(map[string] *Response)
-			method.Responses[`200`]  = &Response{Description: `ok`}
+			method.Responses[`200`]  = &Response{Description: ``}
 		}
 
 		if yamlOutput.Paths[path] == nil {
