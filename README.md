@@ -47,7 +47,7 @@ Now to map your routes, simply add the annotations below anywhere in your code! 
 
 - The response field should be a list of key:value separated by empty spaces.  
   -  The number before `:` indicates the responseCode   
-  -  and the model indicates which model is to be associated with that response.    
+  -  The model  after  `:` indicates which model is to be associated with that response.    
     
 - method annotation value should be in lower case   
 
