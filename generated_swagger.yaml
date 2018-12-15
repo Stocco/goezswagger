@@ -4,11 +4,37 @@ info:
   description: goezswag is a easy swagger
 openapi: 3.0.0
 paths:
-  /v1/dummy/route:
+  /v1/dummy/getarray:
     get:
-      summary: create a dummy route
+      summary: retrieves a list of accountHolders
       tags:
       - list
+      responses:
+        "200":
+          description: ok
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/AccountHolder'
+        "400":
+          description: ok
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Paymentz'
+        "500":
+          description: ok
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MyDummyModelResponse'
+  /v1/dummy/route:
+    get:
+      summary: get account holder
+      tags:
+      - get
       responses:
         "200":
           description: ok
@@ -32,7 +58,6 @@ paths:
       summary: create a dummy route
       tags:
       - create
-      - cardsonfile
       requestBody:
         content:
           application/json:
@@ -51,14 +76,48 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/MyDummyModelResponse'
+  /v2/dummy/route:
+    post:
+      summary: create a dummy route WITH ARRAY IN BODY
+      tags:
+      - create
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: '#/components/schemas/MyDummyModel'
+      responses:
+        "200":
+          description: ok
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MyDummyModelResponse'
+        "400":
+          description: ok
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MyDummyModelResponse'
 components:
   schemas:
     AccountHolder:
       properties:
-        bankaccount:
-          $ref: '#/components/schemas/BankAc'
+        age:
+          type: integer
+          description: the age of the person
         name:
           type: string
+          description: the name of the person
+        surname:
+          type: string
+          description: the surname of the person
+      example:
+        age: 25
+        name: renato
+        surname: stocco
     BankAc:
       properties:
         destination:
