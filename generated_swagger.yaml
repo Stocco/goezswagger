@@ -56,18 +56,6 @@ components:
       properties:
         destination:
           type: boolean
-    Health:
-      properties:
-        components:
-          $ref: '#/components/schemas/HealthComponents'
-        name:
-          type: string
-    HealthComponents:
-      properties:
-        Cache:
-          type: boolean
-        Http:
-          type: boolean
     IncomingTransferRequest:
       properties:
         longitude:
