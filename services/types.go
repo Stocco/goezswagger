@@ -51,8 +51,12 @@ type ApplicationType struct {
 type Schema struct {
 	Ref string  `yaml:"$ref,omitempty"`
 	Type string `yaml:"type,omitempty"`
+	SchemaItems *SchemaItems `yaml:"items,omitempty"`
 }
 
+type SchemaItems struct {
+	Ref  string `yaml:"$ref,omitempty"`
+}
 
 type Info struct {
 	Title string
