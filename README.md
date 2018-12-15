@@ -15,11 +15,13 @@ Your structs should match the golang pattern and have the `//@model` annotation 
 
     //@model MyDummyModel
     type MyDummyModel struct {
-    	FieldOne	             string `json:"field_one" description:"field is the number one" validate:"required"`
+    	FieldOne	             string `json:"field_one" description:"field is the number one" validate:"required" example:"anything you want to add as example"`
     	FieldTwoNotMapped        string `validate:"required"`
     	FieldThreeForgotten      string
-    	FieldFour			      string `json:"field_four"`
+    	FieldFour			      string `json:"field_four" example:"you can add examples without descriptions"`
     }
+
+Beware that by adding the tag `example` the swagger will override the type definition with what you'v pass as example.
 
 The mapper will use your annottated models with only the fields that are annotated with `json`, plus the description (if provided)
 

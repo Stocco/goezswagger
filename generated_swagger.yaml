@@ -15,8 +15,14 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/MyDummyModelResponse'
+                $ref: '#/components/schemas/AccountHolder'
         "400":
+          description: ok
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Paymentz'
+        "500":
           description: ok
           content:
             application/json:
@@ -69,6 +75,7 @@ components:
     MyDummyModel:
       properties:
         aeho:
+          description: this is a composite value
           $ref: '#/components/schemas/NestedVal'
         aeho_arrat:
           type: array
@@ -76,6 +83,7 @@ components:
             $ref: '#/components/schemas/NestedVal'
         field_four:
           type: string
+          description: field is the number four
         field_one:
           type: string
           description: field is the number one
@@ -87,16 +95,20 @@ components:
           type: integer
         amount_double:
           type: number
+          description: field double is of course doubl
+      example:
+        amount_double: 53.21
     NestedVal:
       properties:
-        field_bool:
-          type: boolean
         field_x:
           type: string
+          description: field x is the best
         field_y:
           type: integer
-        field_zeta:
-          type: integer
+          description: field y is integer
+      example:
+        field_x: best
+        field_y: -42
     Paymentz:
       properties:
         type:
