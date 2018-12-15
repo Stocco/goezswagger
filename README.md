@@ -32,12 +32,12 @@ Now to map your structs, they should use the golang pattern and have the `//@mod
 
 Now to map your routes, simply add the annotations below anywhere in your code! (Just for the sake of organization, add above the handlers...)
 
-    //@path `your-api-path`  
-    //@method `method`  
-    //@summary `summary of your api route`  
-    //@tags `create`  
-    //@request `MyDummyModel`  
-    //@response `200:MyDummyModelResponse`    
+    //@path your-api-path  
+    //@method method
+    //@summary summary of your api route  
+    //@tags create  
+    //@request MyDummyModel  
+    //@response 200:MyDummyModelResponse 400:MyDummy400Model 500:MyDummy500Model    
 
 
 - currently tags are in alpha ( it should be a list with empty spaces (create list get ...))
