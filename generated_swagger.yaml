@@ -30,6 +30,18 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/MyDummyModelResponse'
+    patch:
+      summary: update someone
+      tags:
+      - update
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AccountHolder'
+      responses:
+        "200":
+          description: ""
   /v1/dummy/route:
     get:
       summary: get account holder

@@ -19,3 +19,12 @@ func anotherPackage() {
 func anotharPackageArrayResponse() {
 
 }
+
+//@path /v1/dummy/getarray
+//@method patch
+//@summary update someone
+//@tags update
+//@request AccountHolder
+func anotharPackagePatchRequest() {
+
+}
