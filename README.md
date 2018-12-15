@@ -11,7 +11,7 @@ For this beta version the annotations order matters so follow the examples .
 //@version your-api-version  
 //@description your-api-description  
 
-Your structs should match the golang pattern like in the example bellow:
+Your structs should match the golang pattern and have the `//@model` annotation like in the example bellow:
 
     //@model MyDummyModel
     type MyDummyModel struct {
