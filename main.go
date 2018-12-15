@@ -44,7 +44,7 @@ type MyDummyModel struct {
 	FieldTwoNotMapped   *string `validate:"required"`
 	FieldThreeForgotten string
 	FieldFour           string                  `json:"field_four" description:"field is the number four"`
-	FieldFive           NestedVal               `json:"aeho" description:"this is a composite value"`
+	FieldFive           NestedVal               `json:"aeho"`
 	FieldFiveArray      []*NestedVal            `json:"aeho_arrat"`
 	IncReq              IncomingTransferRequest `json:"inc_request"`
 }
@@ -75,7 +75,7 @@ type IncomingTransferRequest struct {
 type AccountHolder struct {
 	Name        string  `json:"name,omitempty" description:"the name of the person" example:"renato"`
 	Surname     string  `json:"surname,omitempty" description:"the surname of the person" example:"stocco"`
-	BankAccount *BankAc `json:"bankaccount" description:"if person has bankaccount" example:"true"`
+	BankAccount *BankAc `json:"bankaccount" example:"true"`
 	Weight      *float64 `json:"weight,omitempty" description:"the weight of this person" example:"73.2"`
 	Age         int     `json:"age,omitempty" description:"the age of the person" example:"25"`
 }

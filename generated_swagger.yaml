@@ -11,7 +11,7 @@ paths:
       - list
       responses:
         "200":
-          description: ok
+          description: ""
           content:
             application/json:
               schema:
@@ -19,13 +19,13 @@ paths:
                 items:
                   $ref: '#/components/schemas/AccountHolder'
         "400":
-          description: ok
+          description: ""
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Paymentz'
         "500":
-          description: ok
+          description: ""
           content:
             application/json:
               schema:
@@ -37,19 +37,19 @@ paths:
       - get
       responses:
         "200":
-          description: ok
+          description: ""
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/AccountHolder'
         "400":
-          description: ok
+          description: ""
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Paymentz'
         "500":
-          description: ok
+          description: ""
           content:
             application/json:
               schema:
@@ -65,13 +65,13 @@ paths:
               $ref: '#/components/schemas/MyDummyModel'
       responses:
         "200":
-          description: ok
+          description: ""
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/MyDummyModelResponse'
         "400":
-          description: ok
+          description: ""
           content:
             application/json:
               schema:
@@ -90,13 +90,13 @@ paths:
                 $ref: '#/components/schemas/MyDummyModel'
       responses:
         "200":
-          description: ok
+          description: ""
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/MyDummyModelResponse'
         "400":
-          description: ok
+          description: ""
           content:
             application/json:
               schema:
@@ -109,7 +109,6 @@ components:
           type: integer
           description: the age of the person
         bankaccount:
-          description: if person has bankaccount
           $ref: '#/components/schemas/BankAc'
         name:
           type: string
@@ -143,7 +142,6 @@ components:
     MyDummyModel:
       properties:
         aeho:
-          description: this is a composite value
           $ref: '#/components/schemas/NestedVal'
         aeho_arrat:
           type: array
